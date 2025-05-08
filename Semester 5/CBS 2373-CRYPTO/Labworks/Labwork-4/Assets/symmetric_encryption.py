@@ -12,9 +12,10 @@ cipher = AES.new(key, AES.MODE_EAX)
 ciphertext, tag = cipher.encrypt_and_digest(data)
 nonce = cipher.nonce
 
-print("Ciphertext:", ciphertext)
-print("Tag:", tag)
-print("Nonce:", nonce)
+print("Ciphertext (hex):", ciphertext.hex())
+print("Tag (hex):", tag.hex())
+print("Nonce (hex):", nonce.hex())
+
 
 # --------------------------
 # Decryption phase
