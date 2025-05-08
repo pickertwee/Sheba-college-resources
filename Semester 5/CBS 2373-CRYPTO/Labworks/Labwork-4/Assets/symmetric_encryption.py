@@ -1,5 +1,5 @@
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
+from Crypto.Cipher import AES #generate AES
+from Crypto.Random import get_random_bytes #get random value (keys)
 
 # Original data
 data = b'Cryptography Lab by Sheba, NWS23010003'
@@ -15,10 +15,7 @@ nonce = cipher.nonce  # Save nonce for decryption
 # Show ciphertext in hex
 print("🔐 Ciphertext (hex):", ciphertext.hex())
 
-# --------------------------
 # Decryption phase
-# --------------------------
-
 # Recreate the cipher for decryption
 cipher_dec = AES.new(key, AES.MODE_EAX, nonce=nonce)
 
