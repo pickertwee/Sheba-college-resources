@@ -17,7 +17,7 @@ choice = input("Enter 1 or 2: ").strip()
 # =================== ENCRYPTION =====================
 if choice == "1":
     print("📂 Select your PUBLIC key (PEM format) for encryption:")
-    public_key_path = filedialog.askopenfilename(title="Select Public Key")
+    public_key_path = filedialog.askopenfilename(title="Select Public Key")  # pops open the file picker window
     if not public_key_path:
         print("❌ No public key selected. Exiting.")
         exit()
@@ -30,7 +30,7 @@ if choice == "1":
 
     # Load public key
     with open(public_key_path, "rb") as f:
-        public_key = serialization.load_pem_public_key(f.read())
+        public_key = serialization.load_pem_public_key(f.read(), backend=default_backend())
 
     # Read file content
     with open(file_to_encrypt, "rb") as f:
@@ -70,16 +70,18 @@ elif choice == "2":
 
     # Load private key
     with open(private_key_path, "rb") as f:
-        private_key = serialization.load_pem_private_key(f.read(), password=None)
+        private_key = serialization.load_pem_private_key(f.read(), password=None, backend=default_backend())
 
-    # Read and decode ciphertext
-    with open(encrypted_file_path, "r", encoding='utf-8', errors='ignore') as f:
+    # Read and decode ciphertext (base64)
+    with open(encrypted_file_path, "rb") as f:  # Open in binary mode
         encrypted_message = f.read()
-    ciphertext = base64.b64decode(encrypted_message)
 
-    # Decrypt
     try:
-        decrypted_message = private_key.decrypt(
+        # Decode the base64 encoded ciphertext
+        ciphertext = base64.b64decode(encrypted_message)
+        
+        # Perform decryption using RSA private key with OAEP padding
+        plaintext = private_key.decrypt(
             ciphertext,
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -87,14 +89,16 @@ elif choice == "2":
                 label=None
             )
         )
-
+        
+        # Return decrypted plaintext (assumes it’s a UTF-8 string)
         decrypted_file_path = encrypted_file_path + ".dec"
         with open(decrypted_file_path, "wb") as f:
-            f.write(decrypted_message)
+            f.write(plaintext)
 
         print(f"✅ Decrypted file saved as: {decrypted_file_path}")
 
     except Exception as e:
+        # Catch any errors (key mismatch, padding issues, etc.)
         print("❌ Decryption failed.")
         print("Reason:", str(e))
 
