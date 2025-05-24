@@ -19,7 +19,7 @@ def hash_file(file_path):
     hash_sha256 = hashlib.sha256()
     try:
         with open(file_path, "rb") as f:
-            while chunk := f.read(4096):
+            while chunk := f.read(4096): #read 4096 bytes at a time
                 hash_sha256.update(chunk)
         return hash_sha256.hexdigest()
     except FileNotFoundError:
